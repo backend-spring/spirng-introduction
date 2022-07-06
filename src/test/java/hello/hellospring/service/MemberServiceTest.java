@@ -76,4 +76,5 @@ class MemberServiceTest {
     @Test
     void finalOne() {
     }
+
 }
