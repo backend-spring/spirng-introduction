@@ -1,12 +1,12 @@
-package hello.hellospring.repository;
+package com.example.hellospring.repository;
 
-import hello.hellospring.domain.Member;
+import com.example.hellospring.domain.Member;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-public class JpaMemberRepository implements MemberRepository{
+public class JpaMemberRepository implements MemberRepository {
 
     private final EntityManager em;
 
@@ -37,7 +37,6 @@ public class JpaMemberRepository implements MemberRepository{
 
     @Override
     public List<Member> findAll() {
-        return em.createQuery("select m from Member m", Member.class)
-                .getResultList();
+        return em.createQuery("select m from Member m", Member.class).getResultList();
     }
 }

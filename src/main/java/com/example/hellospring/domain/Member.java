@@ -1,4 +1,4 @@
-package hello.hellospring.domain;
+package com.example.hellospring.domain;
 
 import javax.persistence.*;
 

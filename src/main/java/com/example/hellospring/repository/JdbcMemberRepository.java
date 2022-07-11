@@ -1,6 +1,8 @@
-package hello.hellospring.repository;
-import hello.hellospring.domain.Member;
+package com.example.hellospring.repository;
+
+import com.example.hellospring.domain.Member;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,15 +30,16 @@ public class JdbcMemberRepository implements MemberRepository {
             pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             pstmt.setString(1, member.getName());
-
             pstmt.executeUpdate();
-            rs = pstmt.getGeneratedKeys();
 
+            rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
                 member.setId(rs.getLong(1));
-            } else {
+            }
+            else {
                 throw new SQLException("id 조회 실패");
             }
+
             return member;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -68,6 +71,36 @@ public class JdbcMemberRepository implements MemberRepository {
             } else {
                 return Optional.empty();
             }
+
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        } finally {
+            close(conn, pstmt, rs);
+        }
+    }
+
+    @Override
+    public Optional<Member> findByName(String name) {
+        String sql = "select * from member where name = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Member member = new Member();
+                member.setId(rs.getLong("id"));
+                member.setName(rs.getString("name"));
+                return Optional.of(member);
+            }
+
+            return Optional.empty();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         } finally {
@@ -86,8 +119,10 @@ public class JdbcMemberRepository implements MemberRepository {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
+
             rs = pstmt.executeQuery();
-            List<Member> members = new ArrayList<>();
+
+            ArrayList<Member> members = new ArrayList<>();
             while (rs.next()) {
                 Member member = new Member();
                 member.setId(rs.getLong("id"));
@@ -96,31 +131,6 @@ public class JdbcMemberRepository implements MemberRepository {
             }
 
             return members;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        } finally {
-            close(conn, pstmt, rs);
-        }
-    }
-
-    @Override
-    public Optional<Member> findByName(String name) {
-        String sql = "select * from member where name = ?";
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try {
-            conn = getConnection();
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, name);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                Member member = new Member();
-                member.setId(rs.getLong("id"));
-                member.setName(rs.getString("name"));
-                return Optional.of(member);
-            }
-            return Optional.empty();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         } finally {
@@ -140,6 +150,7 @@ public class JdbcMemberRepository implements MemberRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         try {
             if (pstmt != null) {
                 pstmt.close();
@@ -147,6 +158,7 @@ public class JdbcMemberRepository implements MemberRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         try {
             if (conn != null) {
                 close(conn);

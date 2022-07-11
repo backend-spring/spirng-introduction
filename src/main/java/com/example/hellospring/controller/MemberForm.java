@@ -1,7 +1,6 @@
-package hello.hellospring.controller;
+package com.example.hellospring.controller;
 
 public class MemberForm {
-
     private String name;
 
     public String getName() {
